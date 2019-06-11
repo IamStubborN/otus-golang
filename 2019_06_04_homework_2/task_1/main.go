@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-const BACKSLASH_INDEX = 92
+const BackslashIndex = 92
 
 func main() {
 	fmt.Println(UnpackingString(`qwe\\5`))
@@ -29,8 +29,8 @@ func UnpackingString(test string) (result string) {
 			} else {
 				result += string(r)
 			}
-		} else if r == BACKSLASH_INDEX {
-			if sl[idx+1] == BACKSLASH_INDEX {
+		} else if r == BackslashIndex {
+			if sl[idx+1] == BackslashIndex {
 				result += string(sl[idx+1])
 			} else if unicode.IsDigit(sl[idx+1]) {
 				sliceNumbers := getDigitSlice(sl, idx+1)
@@ -40,9 +40,9 @@ func UnpackingString(test string) (result string) {
 						log.Fatal(err)
 					}
 					result += strings.Repeat(string(sliceNumbers[0]), numberDigit)
-				} else if r == BACKSLASH_INDEX &&
+				} else if r == BackslashIndex &&
 					unicode.IsDigit(sl[idx+1]) &&
-					sl[idx-1] == BACKSLASH_INDEX {
+					sl[idx-1] == BackslashIndex {
 					numberDigit, err := strconv.Atoi(string(sliceNumbers))
 					if err != nil {
 						log.Fatal(err)
@@ -54,7 +54,7 @@ func UnpackingString(test string) (result string) {
 			}
 		}
 	}
-	return string(result)
+	return result
 }
 
 func getDigitSlice(sl []rune, start int) []rune {
