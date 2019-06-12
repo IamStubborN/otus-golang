@@ -17,20 +17,14 @@ func main() {
 }
 
 func TenPopularWordsFromText(text string) ([]string, error) {
-	textRefactored, err := removeSeletectedChars(text, `\.|,|'|:|\\|/|"|\d`)
-	if err != nil {
-		log.Fatal(err)
-	}
+	textRefactored := removeSeletectedChars(text, `\.|,|'|:|\\|/|"|\d`)
 	list := calculatePopularWords(textRefactored)
 	return getTenPopularWords(list), nil
 }
 
-func removeSeletectedChars(text, regex string) (string, error) {
-	reg, err := regexp.Compile(regex)
-	if err != nil {
-		return "", err
-	}
-	return reg.ReplaceAllString(text, ""), nil
+func removeSeletectedChars(text, regex string) string {
+	reg := regexp.MustCompile(regex)
+	return reg.ReplaceAllString(text, "")
 }
 
 func calculatePopularWords(text string) map[string]int {
@@ -46,24 +40,22 @@ func calculatePopularWords(text string) map[string]int {
 
 func getTenPopularWords(list map[string]int) []string {
 
-	type Word struct {
+	type word struct {
 		str   string
 		count int
 	}
 
 	result := make([]string, 0, 10)
-	words := make([]Word, 0, len(list))
+	words := make([]word, 0, len(list))
 	for key, value := range list {
-		words = append(words, Word{key, value})
+		words = append(words, word{key, value})
 	}
 	sort.Slice(words, func(i, j int) bool {
 		return words[i].count > words[j].count
 	})
 
-	for idx, word := range words {
-		if idx < cap(result) {
-			result = append(result, word.str)
-		}
+	for _, word := range words[0:10] {
+		result = append(result, word.str)
 	}
 	return result
 }
