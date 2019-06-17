@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/IamStubborN/otus-golang/2019_06_28_homework_1/task_2/shortener"
+	"github.com/IamStubborN/otus-golang/2019_05_28_homework_1/task_2/shortener"
 )
 
 func main() {
