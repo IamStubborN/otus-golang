@@ -1,4 +1,4 @@
-package main
+package otus_events
 
 import (
 	"fmt"
