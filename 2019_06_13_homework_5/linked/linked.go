@@ -1,4 +1,4 @@
-package main
+package linked
 
 import (
 	"fmt"
@@ -145,14 +145,4 @@ func (it *item) Prev() *item {
 
 func (it *item) String() string {
 	return fmt.Sprintf("%v", it.Value())
-}
-
-func main() {
-	list := CreateLinkedList()
-
-	list.PushBack("2")
-	list.PushBack("3")
-	list.PushFront("1")
-
-	fmt.Println(list)
 }

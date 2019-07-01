@@ -1,4 +1,4 @@
-package main
+package internet_time
 
 import (
 	"fmt"
