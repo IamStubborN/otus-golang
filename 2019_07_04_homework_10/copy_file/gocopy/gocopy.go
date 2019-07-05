@@ -1,7 +1,6 @@
 package gocopy
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -9,17 +8,6 @@ import (
 	"strings"
 	"time"
 )
-
-var from, to string
-var offset, limit int64
-
-func init() {
-	flag.StringVar(&from, "from", "", "from /path/to/source")
-	flag.StringVar(&to, "to", "", "to /path/to/source")
-	flag.Int64Var(&offset, "offset", 0, "offset 1024")
-	flag.Int64Var(&limit, "limit", 0, "limit 2048")
-	flag.Parse()
-}
 
 func WriteFile(from, to string, offset, limit int64) (int, error) {
 
@@ -34,7 +22,7 @@ func WriteFile(from, to string, offset, limit int64) (int, error) {
 		log.Fatal(err)
 	}
 	defer fileDestination.Close()
-	
+
 	length, err := getLengthOfFileInBytes(fileSource)
 	if err != nil {
 		return 0, err
@@ -93,7 +81,6 @@ func write(src io.ReaderAt, dst io.WriterAt, buffer []byte) (int, error) {
 	}
 	return totalBytes, nil
 }
-
 func progressWrite(w io.Writer, percent int) {
 	progress := strings.Repeat("░", percent/5)
 	fmt.Fprint(w, fmt.Sprintf("\r 0  %s %d", progress, percent))
