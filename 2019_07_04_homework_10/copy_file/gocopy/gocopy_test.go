@@ -56,7 +56,9 @@ func TestWriteFile(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			defer from.Close()
+			if err := from.Close(); err != nil {
+				log.Fatal(err)
+			}
 
 			_, err = from.WriteString(tt.args.text)
 			if err != nil {
@@ -67,7 +69,9 @@ func TestWriteFile(t *testing.T) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			defer to.Close()
+			if err := to.Close(); err != nil {
+				log.Fatal(err)
+			}
 
 			got, err := WriteFile(os.TempDir()+"/from", os.TempDir()+"/to", tt.args.offset, tt.args.limit)
 			if (err != nil) != tt.wantErr {

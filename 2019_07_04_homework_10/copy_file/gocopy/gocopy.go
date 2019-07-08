@@ -9,19 +9,25 @@ import (
 	"time"
 )
 
+// WriteFile from path to path with offset and limit in bytes.
 func WriteFile(from, to string, offset, limit int64) (int, error) {
 
 	fileSource, err := os.OpenFile(from, os.O_RDONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer fileSource.Close()
+
+	if err := fileSource.Close(); err != nil {
+		log.Fatal(err)
+	}
 
 	fileDestination, err := os.OpenFile(to, os.O_RDWR, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer fileDestination.Close()
+	if err := fileDestination.Close(); err != nil {
+		log.Fatal(err)
+	}
 
 	length, err := getLengthOfFileInBytes(fileSource)
 	if err != nil {
@@ -83,9 +89,15 @@ func write(src io.ReaderAt, dst io.WriterAt, buffer []byte) (int, error) {
 }
 func progressWrite(w io.Writer, percent int) {
 	progress := strings.Repeat("░", percent/5)
-	fmt.Fprint(w, fmt.Sprintf("\r 0  %s %d", progress, percent))
+	_, err := fmt.Fprint(w, fmt.Sprintf("\r 0  %s %d", progress, percent))
+	if err != nil {
+		log.Fatal(err)
+	}
 	if percent == 100 {
-		fmt.Fprintln(w)
+		_, err = fmt.Fprintln(w)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 

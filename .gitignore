@@ -7,7 +7,7 @@
 
 *.DS_Store
 ._*
-
+.idea/
 # Test binary, build with `go test -c`
 *.test
 
