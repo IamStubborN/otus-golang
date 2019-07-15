@@ -6,28 +6,22 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 )
 
 // WriteFile from path to path with offset and limit in bytes.
-func WriteFile(from, to string, offset, limit int64) (int, error) {
+func WriteFile(from, to string, offset, limit int64) (int64, error) {
 
 	fileSource, err := os.OpenFile(from, os.O_RDONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	if err := fileSource.Close(); err != nil {
-		log.Fatal(err)
-	}
+	defer fileSource.Close()
 
 	fileDestination, err := os.OpenFile(to, os.O_RDWR, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := fileDestination.Close(); err != nil {
-		log.Fatal(err)
-	}
+	defer fileDestination.Close()
 
 	length, err := getLengthOfFileInBytes(fileSource)
 	if err != nil {
@@ -45,50 +39,45 @@ func WriteFile(from, to string, offset, limit int64) (int, error) {
 		return 0, fmt.Errorf("limit %d and offset %d out of file with size %d", limit, offset, length)
 	}
 
-	buffer := make([]byte, limit)
-
-	_, err = fileSource.ReadAt(buffer, offset)
-	if err != nil {
-		return 0, err
-	}
-	written, err := write(fileSource, fileDestination, buffer)
+	written, err := write(fileSource, fileDestination, offset, limit)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return written, nil
 }
 
-func write(src io.ReaderAt, dst io.WriterAt, buffer []byte) (int, error) {
+func write(fileSource, fileDestination *os.File, offset, limit int64) (int64, error) {
+	var step int64 = 10
+	var totalBytes int64 = 0
 
-	off := 0
-	step := 8
-	totalBytes := 0
-	length := len(buffer)
-	for totalBytes < length {
-		b, err := dst.WriteAt(buffer[totalBytes:off], int64(totalBytes))
+	_, err := fileSource.Seek(offset, io.SeekStart)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for totalBytes < limit {
+
+		if totalBytes+step > limit {
+			step = limit - totalBytes
+		}
+
+		b, err := io.CopyN(fileDestination, fileSource, step)
 		if err != nil {
 			return 0, err
 		}
 
-		if off+step > length {
-			off = length
-		} else {
-			off += step
-		}
-
 		totalBytes += b
 
-		prevPercent := (totalBytes - step) * 100 / length
-		currentPercent := (totalBytes) * 100 / length
+		prevPercent := (totalBytes - step) * 100 / limit
+		currentPercent := (totalBytes * 100)/ limit
 		if prevPercent != currentPercent {
 			progressWrite(os.Stdout, currentPercent)
 		}
-		time.Sleep(3 * time.Millisecond) // Для наглядности
 	}
 	return totalBytes, nil
 }
-func progressWrite(w io.Writer, percent int) {
-	progress := strings.Repeat("░", percent/5)
+func progressWrite(w io.Writer, percent int64) {
+	progress := strings.Repeat("░", int(percent)/5)
 	_, err := fmt.Fprint(w, fmt.Sprintf("\r 0  %s %d", progress, percent))
 	if err != nil {
 		log.Fatal(err)

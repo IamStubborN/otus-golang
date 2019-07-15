@@ -28,11 +28,4 @@ make test<br/>
 make clean<br/>
 make run<br/>
 
-make build_windows<br/>
-make build_darwin<br/>
-make build_linux<br/>
 make build_docker<br/>
-
-
-go test
-

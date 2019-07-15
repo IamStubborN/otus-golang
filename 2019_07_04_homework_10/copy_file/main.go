@@ -10,7 +10,7 @@ import (
 )
 
 const usage = `
-Hello, it's my programm for copying files - gocopy. 
+Hello, it's my program for copying files - gocopy. 
 	This is flags for usage: 
 		-from string - path to source. 
 		-to string - path to destination. 
