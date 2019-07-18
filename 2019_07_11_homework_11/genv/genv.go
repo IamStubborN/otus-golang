@@ -15,18 +15,17 @@ func AddEnvsFromFolder(path string) error {
 	}
 
 	for _, fi := range dir {
+		fp := filepath.Join(path, fi.Name())
 		if fi.IsDir() {
-			fp := filepath.Join(path, fi.Name())
 			if err := AddEnvsFromFolder(fp); err != nil {
 				log.Fatal(err)
 			}
 		} else {
-			key := fi.Name()
-			value, err := ioutil.ReadFile(filepath.Join(path, fi.Name()))
+			value, err := ioutil.ReadFile(fp)
 			if err != nil {
 				return err
 			}
-			if err := os.Setenv(key, string(value)); err != nil {
+			if err := os.Setenv(fi.Name(), string(value)); err != nil {
 				return err
 			}
 		}
