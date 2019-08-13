@@ -6,24 +6,29 @@
     GOTEST=$(GOCMD) test
     GOGET=$(GOCMD) get
     GOINSTALL=$(GOCMD) install
+    GOGENERATE=$(GOCMD) generate
     GOLINT=golangci-lint
-    GOIMPORTS=goimports -v -w .
+    GOIMPORTS=goimports
     BINARY_NAME=calendar
+    MAIN=./cmd
 
     all:
-		$(GOIMPORTS)
+		$(GOIMPORTS) -v -w .
 		$(GOTEST) -v ./...
 		$(GOLINT) run ./... -v
-		$(GOBUILD) -o $(BINARY_NAME) -v
+		$(GOBUILD) -o $(BINARY_NAME) -v $(MAIN)
     build: 
 		GOOS=$(GOOS) $(GOBUILD) -o $(BINARY_NAME) -v
     test:
 		$(GOTEST) -v ./...
-    clean: 
+    clean:
 		$(GOCLEAN)
+		rm -rf $(BINARY_NAME)
     run:
-		$(GORUN) .
+		$(GORUN) $(MAIN)
+    generate:
+		$(GOGENERATE) ./...
     imp:
-		$(GOIMPORTS)
+		$(GOIMPORTS) -v -w .
     install:
 		$(GOGET) github.com/IamStubborN/otus-golang/2019_07_04_homework_10/copy_file

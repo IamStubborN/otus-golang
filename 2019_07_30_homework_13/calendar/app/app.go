@@ -1,4 +1,4 @@
-package cmd
+package app
 
 import (
 	"github.com/IamStubborN/otus-golang/2019_07_30_homework_13/calendar/config"
@@ -13,7 +13,7 @@ type App struct {
 func NewApp() *App {
 	app := &App{}
 	cfg := initializeConfig()
-	app.initializeLogger(cfg)
+	app.Logger = initializeLogger(cfg)
 	return app
 }
 
@@ -25,12 +25,12 @@ func initializeConfig() *config.Config {
 	return cfg
 }
 
-func (app *App) initializeLogger(cfg *config.Config) {
+func initializeLogger(cfg *config.Config) *logrus.Logger {
 	log, err := logger.NewLogger(cfg.Logger)
 	if err != nil {
-		app.Logger.Fatalln(err)
+		logrus.Fatalln(err)
 	}
-	app.Logger = log
+	return log
 }
 
 func (app *App) Run() {
