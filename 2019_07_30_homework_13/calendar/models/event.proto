@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package models;
+
+message Event {
+    uint64 ID = 1;
+    string Name = 2;
+    string Description = 3;
+    string Date = 4;
+}

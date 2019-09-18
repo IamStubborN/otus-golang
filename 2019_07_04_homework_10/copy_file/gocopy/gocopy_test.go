@@ -1,6 +1,7 @@
 package gocopy
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"testing"
@@ -15,7 +16,7 @@ func TestWriteFile(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    int
+		want    int64
 		wantErr bool
 	}{
 		{
@@ -52,24 +53,24 @@ func TestWriteFile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			from, err := os.Create(os.TempDir() + "/from")
+			from, err := ioutil.TempFile(os.TempDir(), "gocopy-")
 			if err != nil {
 				log.Fatal(err)
 			}
-			defer from.Close()
+			defer os.Remove(from.Name())
+
+			to, err := ioutil.TempFile(os.TempDir(), "gocopy-")
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer os.Remove(to.Name())
 
 			_, err = from.WriteString(tt.args.text)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			to, err := os.Create(os.TempDir() + "/to")
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer to.Close()
-
-			got, err := WriteFile(os.TempDir()+"/from", os.TempDir()+"/to", tt.args.offset, tt.args.limit)
+			got, err := WriteFile(from.Name(), to.Name(), tt.args.offset, tt.args.limit)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("WriteFile() error = %v, wantErr %v", err, tt.wantErr)
 				return
