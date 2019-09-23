@@ -1,0 +1,7 @@
+logger:
+  level: debug
+
+storage:
+  provider: postgres
+  dsn: user=postgres dbname=calendar host=localhost port=5432 sslmode=disable
+  retry: 10
