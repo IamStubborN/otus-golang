@@ -2,6 +2,7 @@ package gc
 
 import (
 	"context"
+
 	"github.com/IamStubborN/otus-golang/2019_08_27_homework_16/calendar/service/event/repository"
 
 	"github.com/IamStubborN/otus-golang/2019_08_27_homework_16/calendar/service/event/domain"
@@ -30,7 +31,7 @@ func (s *Server) Create(ctx context.Context, req *CreateRequest) (*CreateRespons
 		Date:        req.Event.Date,
 	}
 
-	ev, err := s.Storage.Create(ev)
+	ev, err := s.Storage.Create(ctx, ev)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func (s *Server) Create(ctx context.Context, req *CreateRequest) (*CreateRespons
 }
 
 func (s *Server) Read(ctx context.Context, req *ReadRequest) (*ReadResponse, error) {
-	ev, err := s.Storage.Read(req.Event_ID)
+	ev, err := s.Storage.Read(ctx, req.Event_ID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +72,7 @@ func (s *Server) Update(ctx context.Context, req *UpdateRequest) (*UpdateRespons
 		Date:        req.Event.Date,
 	}
 
-	updated, err := s.Storage.Update(ev)
+	updated, err := s.Storage.Update(ctx, ev)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +83,7 @@ func (s *Server) Update(ctx context.Context, req *UpdateRequest) (*UpdateRespons
 }
 
 func (s *Server) Delete(ctx context.Context, req *DeleteRequest) (*DeleteResponse, error) {
-	deleted, err := s.Storage.Delete(req.Event_ID)
+	deleted, err := s.Storage.Delete(ctx, req.Event_ID)
 	if err != nil {
 		return nil, err
 	}

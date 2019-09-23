@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"sync"
 
@@ -19,7 +20,7 @@ func NewCache() EvInterface {
 	}
 }
 
-func (e *EventsCache) Create(event *domain.Event) (*domain.Event, error) {
+func (e *EventsCache) Create(ctx context.Context, event *domain.Event) (*domain.Event, error) {
 	e.Lock()
 	defer e.Unlock()
 	id := uint64(len(e.storage))
@@ -30,7 +31,7 @@ func (e *EventsCache) Create(event *domain.Event) (*domain.Event, error) {
 	return event, nil
 }
 
-func (e *EventsCache) Read(eventId uint64) (*domain.Event, error) {
+func (e *EventsCache) Read(ctx context.Context, eventId uint64) (*domain.Event, error) {
 	e.RLock()
 	defer e.RUnlock()
 
@@ -41,7 +42,7 @@ func (e *EventsCache) Read(eventId uint64) (*domain.Event, error) {
 	return e.storage[eventId], nil
 }
 
-func (e *EventsCache) Update(event *domain.Event) (bool, error) {
+func (e *EventsCache) Update(ctx context.Context, event *domain.Event) (bool, error) {
 	e.Lock()
 	defer e.Unlock()
 
@@ -54,7 +55,7 @@ func (e *EventsCache) Update(event *domain.Event) (bool, error) {
 	return true, nil
 }
 
-func (e *EventsCache) Delete(eventId uint64) (bool, error) {
+func (e *EventsCache) Delete(ctx context.Context, eventId uint64) (bool, error) {
 	e.Lock()
 	defer e.Unlock()
 

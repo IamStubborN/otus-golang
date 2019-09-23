@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -62,7 +63,7 @@ func retryConnect(db *sqlx.DB, fatalRetry int) error {
 	return nil
 }
 
-func (d *Database) Create(ev *domain.Event) (*domain.Event, error) {
+func (d *Database) Create(ctx context.Context, ev *domain.Event) (*domain.Event, error) {
 	query := `
 	insert into events("name", description, "date") 
 		values (:name, :description, :date) returning id
@@ -74,13 +75,13 @@ func (d *Database) Create(ev *domain.Event) (*domain.Event, error) {
 		"date":        ev.Date,
 	}
 
-	stmt, err := d.pool.PrepareNamed(query)
+	stmt, err := d.pool.PrepareNamedContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 
 	var id uint64
-	err = stmt.QueryRowx(argsQ).Scan(&id)
+	err = stmt.QueryRowxContext(ctx, argsQ).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
@@ -90,12 +91,12 @@ func (d *Database) Create(ev *domain.Event) (*domain.Event, error) {
 	return ev, nil
 }
 
-func (d *Database) Read(eventID uint64) (*domain.Event, error) {
+func (d *Database) Read(ctx context.Context, eventID uint64) (*domain.Event, error) {
 	query := `select id, "name", description, "date" from events where id=$1`
 
 	var ev domain.Event
 
-	err := d.pool.QueryRowx(query, eventID).Scan(&ev.ID, &ev.Name, &ev.Description, &ev.Date)
+	err := d.pool.QueryRowxContext(ctx, query, eventID).Scan(&ev.ID, &ev.Name, &ev.Description, &ev.Date)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func (d *Database) Read(eventID uint64) (*domain.Event, error) {
 	return &ev, nil
 }
 
-func (d *Database) Update(ev *domain.Event) (bool, error) {
+func (d *Database) Update(ctx context.Context, ev *domain.Event) (bool, error) {
 	query := `update events set "name"=:name, description=:description, "date"=:date 
 		where id=:id`
 
@@ -114,7 +115,7 @@ func (d *Database) Update(ev *domain.Event) (bool, error) {
 		"date":        ev.Date,
 	}
 
-	res, err := d.pool.NamedExec(query, argsQ)
+	res, err := d.pool.NamedExecContext(ctx, query, argsQ)
 	if err != nil {
 		return false, err
 	}
@@ -131,10 +132,10 @@ func (d *Database) Update(ev *domain.Event) (bool, error) {
 	return true, nil
 }
 
-func (d *Database) Delete(eventID uint64) (bool, error) {
+func (d *Database) Delete(ctx context.Context, eventID uint64) (bool, error) {
 	query := `delete from events where id=$1`
 
-	res, err := d.pool.Exec(query, eventID)
+	res, err := d.pool.ExecContext(ctx, query, eventID)
 	if err != nil {
 		return false, err
 	}
